@@ -4,13 +4,18 @@ import me.dio.academia.digital.entity.Aluno;
 import me.dio.academia.digital.entity.AvaliacaoFisica;
 import me.dio.academia.digital.entity.form.AvaliacaoFisicaForm;
 import me.dio.academia.digital.entity.form.AvaliacaoFisicaUpdateForm;
+import me.dio.academia.digital.exception.BusinessException;
+import me.dio.academia.digital.mapper.AvaliacaoMapper;
 import me.dio.academia.digital.repository.AlunoRepository;
 import me.dio.academia.digital.repository.AvaliacaoFisicaRepository;
 import me.dio.academia.digital.service.IAvaliacaoFisicaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class AvaliacaoFisicaServiceImpl implements IAvaliacaoFisicaService {
@@ -19,10 +24,17 @@ public class AvaliacaoFisicaServiceImpl implements IAvaliacaoFisicaService {
     private AvaliacaoFisicaRepository repository;
     @Autowired
     private AlunoRepository alunoRepository;
+
+    @Autowired
+    private AvaliacaoMapper mapper;
     @Override
     public AvaliacaoFisica create(AvaliacaoFisicaForm form) {
         AvaliacaoFisica avaliacaoFisica = new AvaliacaoFisica();
-        Aluno aluno = alunoRepository.findById(form.getAlunoId()).get();
+        Optional<Aluno> byId = alunoRepository.findById(form.getAlunoId());
+        if (byId.isEmpty()){
+            throw new BusinessException("Aluno não cadastrado.");
+        }
+        Aluno aluno = byId.get();
         avaliacaoFisica.setAluno(aluno);
         avaliacaoFisica.setPeso(form.getPeso());
         avaliacaoFisica.setAltura(form.getAltura());
@@ -31,21 +43,42 @@ public class AvaliacaoFisicaServiceImpl implements IAvaliacaoFisicaService {
 
     @Override
     public AvaliacaoFisica get(Long id) {
-        return null;
+        Optional<AvaliacaoFisica> byId = repository.findById(id);
+        if (byId.isEmpty()){
+            throw new BusinessException("Avaliação não encontrada");
+        }
+        return byId.get();
     }
 
     @Override
     public List<AvaliacaoFisica> getAll() {
-        return null;
+        return repository.findAll();
     }
 
     @Override
     public AvaliacaoFisica update(Long id, AvaliacaoFisicaUpdateForm formUpdate) {
-        return null;
+        Optional<AvaliacaoFisica> byId = repository.findById(id);
+        if (byId.isEmpty()){
+            throw new BusinessException("Avaliação não encontrada.");
+        }
+        AvaliacaoFisica avaliacaoFisica = mapper.toAvaliacaoFisica(formUpdate);
+        avaliacaoFisica.setId(id);
+        avaliacaoFisica.setAluno(byId.get().getAluno());
+//        AvaliacaoFisica avaliacaoFisica = byId.get();
+//        avaliacaoFisica.setPeso(formUpdate.getPeso());
+//        avaliacaoFisica.setAltura(formUpdate.getAltura());
+        return repository.save(avaliacaoFisica);
     }
 
     @Override
     public void delete(Long id) {
+        Optional<AvaliacaoFisica> byId = repository.findById(id);
+        if (byId.isEmpty()){
+            throw new BusinessException("Avaliação não encontrada.");
+        }else {
+            repository.deleteById(id);
+        }
+
 
     }
 }

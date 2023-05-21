@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.br.CPF;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Past;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
@@ -17,12 +18,12 @@ public class AlunoForm {
   @Size(min = 3,max = 30,message = "'${validatedValue}' precisa estar entre {min} e {max} caracteres.")
   private String nome;
   @NotBlank(message = "Preencha corretamente.")
-  //@CPF(message = "'{$validatedValue}' é invalido")
+  @CPF(message = "'${validatedValue}' é invalido")
   private String cpf;
   @NotBlank(message = "Preencha o campo corretamente.")
   @Size(min = 3,max = 30,message = "'${validatedValue}' precisa estar entre {min} e {max} caracteres.")
   private String bairro;
-  @NotBlank(message = "Preencha o campo corretamente.")
-  @Past(message = " Data '{$validatedValue}' é invalido")
+  @NotNull(message = "Preencha o campo corretamente.")
+  @Past(message = " Data '${validatedValue}' é invalido")
   private LocalDate dataDeNascimento;
 }

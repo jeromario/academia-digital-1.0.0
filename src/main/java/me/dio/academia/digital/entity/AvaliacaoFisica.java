@@ -15,7 +15,7 @@ public class AvaliacaoFisica {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
-  @ManyToOne(cascade = CascadeType.ALL)
+  @ManyToOne
   @JoinColumn(name = "aluno_id")
   private Aluno aluno;
 
@@ -24,5 +24,6 @@ public class AvaliacaoFisica {
   private double peso;
   @Column(name = "altura_atual")
   private double altura;
+
 
 }
